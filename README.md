@@ -48,7 +48,7 @@ Fork the repository so that you can push any changes you make to your own forked
 
 [Login to JASMIN](https://help.jasmin.ac.uk/docs/getting-started/how-to-login/):
 ```bash
-ssh -A <YOUR JASMIN USERNAME>@login-01.jasmin.ac.uk
+ssh -A <YOUR JASMIN USERNAME>@login.jasmin.ac.uk
 ```
 From there log into the interactive GPU node:
 ```bash
