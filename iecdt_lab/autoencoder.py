@@ -31,8 +31,10 @@ class ConvBlock(nn.Module):
 
 
 class Encoder(nn.Module):
-    def __init__(self, input_channels: int, latent_dim: int):
+    def __init__(self, input_channels: int, latent_dim: int, max_pooling: bool, stride: int):
         super().__init__()
+        self.max_pooling = max_pooling
+        self.stride = stride
         # Input shape: (batch_size, 1, 256, 256)
         self.conv1 = nn.Conv2d(
             in_channels=input_channels,
@@ -55,19 +57,26 @@ class Encoder(nn.Module):
             stride=2,
             padding=1,
         )  # (batch_size, 128, 32, 32)
-        self.linear = nn.Linear(32 * 32 * 128, latent_dim)
+        if self.max_pooling:
+            self.linear = nn.Linear(4 * 4 * 128, latent_dim)
+        else:
+            self.linear = nn.Linear(32 * 32 * 128, latent_dim)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        x = F.relu(self.conv1(x))
-        x = F.relu(self.conv2(x))
-        x = F.relu(self.conv3(x))
+        if self.max_pooling:
+            m = nn.MaxPool2d(2, stride=2)
+        else:
+            m = lambda x : x
+        x = m(F.relu(self.conv1(x)))
+        x = m(F.relu(self.conv2(x)))
+        x = m(F.relu(self.conv3(x)))
         x = x.flatten(start_dim=1)  # Flatten all dimensions except batch
         x = self.linear(x)
         return x
 
 
 class Decoder(nn.Module):
-    def __init__(self, input_channels: int, latent_dim: int):
+    def __init__(self, input_channels: int, latent_dim: int, sigmoid: bool):
         super().__init__()
         self.linear = nn.Linear(latent_dim, 32 * 32 * 128)
         self.conv1 = nn.ConvTranspose2d(
@@ -101,6 +110,7 @@ class Decoder(nn.Module):
             stride=1,
             padding=1,
         )
+        self.sigmoid=sigmoid
 
     def forward(self, z: torch.Tensor) -> torch.Tensor:
         z = self.linear(z)
@@ -109,14 +119,16 @@ class Decoder(nn.Module):
         z = F.relu(self.conv2(z))
         z = F.relu(self.conv3(z))
         z = self.conv4(z)
+        if self.sigmoid:
+            z=F.sigmoid(z)
         return z
 
 
 class CNNAutoencoder(nn.Module):
-    def __init__(self, latent_dim: int, input_channels: int = 3) -> None:
+    def __init__(self, latent_dim: int, max_pooling: bool, sigmoid: bool, stride: int, input_channels: int = 3) -> None:
         super().__init__()
-        self.encoder = Encoder(input_channels, latent_dim)
-        self.decoder = Decoder(input_channels, latent_dim)
+        self.encoder = Encoder(input_channels, latent_dim, max_pooling, stride)
+        self.decoder = Decoder(input_channels, latent_dim, sigmoid)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         z = self.encoder(x)
