@@ -93,7 +93,7 @@ def main(cfg: DictConfig):
         load_tiles=cfg.load_tiles,
     )
 
-    model = iecdt_lab.autoencoder.CNNAutoencoder(latent_dim=cfg.latent_dim)
+    model = iecdt_lab.autoencoder.CNNAutoencoder(latent_dim=cfg.latent_dim, max_pooling=cfg.max_pooling, sigmoid=cfg.sigmoid, stride=cfg.stride)
     model = model.to(cfg.device)
 
     criterion = nn.MSELoss()
