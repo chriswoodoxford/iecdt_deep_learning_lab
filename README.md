@@ -141,7 +141,7 @@ It can be interesting to compare the embedding space of models that are trained 
 The `train_autoencoder.py` script trains an autoencoder architecture specified in the `iecdt_lab/autoencoder.py` file with hyperparameters specified in `config_ae`.
 You can run the script in the same manner as the `train_resnet.py` script, e.g.
 ```bash
-uv run train_resnet.py wandb.mode="offline" smoke_test=True log_freq=10 device="cuda"
+uv run train_autoencoder.py wandb.mode="offline" log_freq=10 device="cuda"
 ```
 for debugging.
 
