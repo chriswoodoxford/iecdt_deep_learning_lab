@@ -99,7 +99,8 @@ def main(cfg: DictConfig):
     criterion = nn.MSELoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=cfg.learning_rate)
 
-    val_array = [] #array of val_mse
+    val_array = [] #array of val_mse, i.e., array of validation errors
+    tra_array = [] #array of train_mse, i.e., array of training errors
 
     for epoch in range(cfg.epochs):
         model.train()
@@ -125,15 +126,21 @@ def main(cfg: DictConfig):
                 break
 
         eval_fig, val_mse = validation(cfg, model, val_data_loader, data_stats)
+        tra_mse = validation(cfg, model, train_data_loader, data_stats)[1]
         val_array.append(val_mse)
+        tra_array.append(tra_mse)
         # print(val_array) #FOR DEBUGGING ONLY
         wandb.log({"predictions": eval_fig, "loss/val": val_mse})
 
         if cfg.smoke_test:
             break
-
+    
+    #Save training and validation error at end of each epoch
+    tra_array=np.array(tra_array)
+    tra_array.tofile('tra_error.csv',sep=',')
     val_array=np.array(val_array)
     val_array.tofile('val_error.csv',sep=',')
+
     torch.save(model.state_dict(), "model.pth")
 
 
