@@ -132,6 +132,7 @@ def main(cfg: DictConfig):
         if cfg.smoke_test:
             break
 
+    val_array=np.array(val_array)
     val_array.tofile('val_error.csv',sep=',')
     torch.save(model.state_dict(), "model.pth")
 
