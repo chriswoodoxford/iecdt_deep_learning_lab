@@ -19,6 +19,8 @@ max_pooling: False
 sigmoid: True
 stride: 3
 latent_dim: 128
+random_initial: True #Whether to initialise random weights. If set to False, make sure to specify path_weights, which should be the relative path to the model weights you want to initialise on!!!
+path_weights: "" #e.g., "logs/test/runs/2026-02-12_11-36-31/model.pth"
 
 dataloader_workers: 1
 load_tiles: True # Whether to load tiles into memory

@@ -94,6 +94,11 @@ def main(cfg: DictConfig):
     )
 
     model = iecdt_lab.autoencoder.CNNAutoencoder(latent_dim=cfg.latent_dim, max_pooling=cfg.max_pooling, sigmoid=cfg.sigmoid, stride=cfg.stride)
+    if not cfg.random_initial:
+        try:
+            model.load_state_dict(torch.load(cfg.path_weights,map_location=cfg.device,weights_only=True))
+        except:
+            print("Error Loading Weights")
     model = model.to(cfg.device)
 
     criterion = nn.MSELoss()
