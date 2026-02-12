@@ -98,7 +98,7 @@ def main(cfg: DictConfig):
         try:
             model.load_state_dict(torch.load(cfg.path_weights,map_location=cfg.device,weights_only=True))
         except:
-            print("Error Loading Weights")
+            print("Error Loading Weights. Initialising random weights.")
     model = model.to(cfg.device)
 
     criterion = nn.MSELoss()
