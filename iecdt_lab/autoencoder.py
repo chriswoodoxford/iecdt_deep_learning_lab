@@ -4,6 +4,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+import math
 
 class ConvBlock(nn.Module):
     def __init__(
@@ -40,27 +41,27 @@ class Encoder(nn.Module):
             in_channels=input_channels,
             out_channels=32,
             kernel_size=3,
-            stride=2,
+            stride=self.stride,
             padding=1,
         )  # (batch_size, 32, 128, 128)
         self.conv2 = nn.Conv2d(
             in_channels=32,
             out_channels=64,
             kernel_size=3,
-            stride=2,
+            stride=self.stride,
             padding=1,
         )  # (batch_size, 64, 64, 64)
         self.conv3 = nn.Conv2d(
             in_channels=64,
             out_channels=128,
             kernel_size=3,
-            stride=2,
+            stride=self.stride,
             padding=1,
         )  # (batch_size, 128, 32, 32)
+        s = (math.ceil(math.ceil(math.ceil(256/self.stride)/self.stride)/self.stride)**2)*128
         if self.max_pooling:
-            self.linear = nn.Linear(4 * 4 * 128, latent_dim)
-        else:
-            self.linear = nn.Linear(32 * 32 * 128, latent_dim)
+            s=s/4**3
+        self.linear = nn.Linear(int(s), latent_dim)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         if self.max_pooling:

@@ -14,10 +14,10 @@ log_freq: 100
 # Optimization process
 epochs: 10
 learning_rate: 0.001
-batch_size: 128
-max_pooling: False
+batch_size: 32
+max_pooling: True 
 sigmoid: True
-stride: 3
+stride: 2 
 latent_dim: 128
 
 dataloader_workers: 1
